@@ -122,6 +122,26 @@ class Astar:
         # Search ended
         # Goal not found
         return
+    
+    def is_goal_reached(self, current):
+        return (current[0] - self.goal[0])*(current[0] - self.goal[0]) + (current[1] - self.goal[1])*(current[1] - self.goal[1]) <= 64
+    
+    def backtrack(self):
+        
+        path = []
+        current = self.goal
+
+        while current != self.start:
+            
+            path.append(current)
+            
+            current = self.came_from[current]
+        
+        path.append(self.start)
+        path.reverse()
+
+        self.visualise(self.obstacles, self.visited, path)
+        return path
 
 
 def main():
