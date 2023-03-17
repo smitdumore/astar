@@ -85,6 +85,44 @@ class Astar:
         self.cost_so_far = {}
         self.visited = []
 
+    def search(self):
+
+        heapq.heappush(self.heap, (0, self.start))
+        self.came_from[self.start] = None
+        self.cost_so_far[self.start] = 0
+
+        while self.heap:
+            current = heapq.heappop(self.heap)[1]
+
+            print("searching", current[0], tab_height - current[1])
+
+            self.visited.append(current)
+
+            if self.is_goal_reached(current):
+                self.came_from[self.goal] = current
+                print("Goal found")
+                self.backtrack()
+                break
+
+            for next in self.neighbors(current):
+
+                if next in self.visited:
+                    continue
+                
+                edge_cost = self.step_size
+                new_cost = self.cost_so_far[current] + edge_cost
+
+                if next not in self.cost_so_far or new_cost < self.cost_so_far[next]:         
+                    self.cost_so_far[next] = new_cost
+                    h = self.heuristic(next[0], next[1])
+                    priority = new_cost + h
+                    heapq.heappush(self.heap, (priority, next))
+                    self.came_from[next] = current
+
+        # Search ended
+        # Goal not found
+        return
+
 
 def main():
 
