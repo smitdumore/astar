@@ -149,7 +149,9 @@ def main():
     # Get start pos from user
     start_x = int(input("Enter start x coordinate: "))
     start_y = int(input("Enter start y coordinate: "))
-    start_ori = int(input("Enter start orientation: "))
+    start_ori = int(input("Enter start orientation (in deg.): "))
+    start_ori = 360 - start_ori
+    start_ori = start_ori*(np.pi)/180
     # Change origin
     start_y = tab_height - start_y
     start = (start_x, start_y, start_ori)
@@ -157,7 +159,9 @@ def main():
     # get goal pos from user
     goal_x = int(input("Enter goal x coordinate: "))
     goal_y = int(input("Enter goal y coordinate: "))
-    goal_ori = int(input("Enter goal orientation: "))
+    goal_ori = int(input("Enter goal orientation (in deg.) : "))
+    goal_ori = 360 - goal_ori
+    goal_ori = goal_ori*(np.pi)/180
     # Change origin
     goal_y = tab_height - goal_y
     goal = (goal_x, goal_y, goal_ori)
@@ -181,6 +185,7 @@ def main():
         return
     elif 0 < goal[0] and goal[0] >= tab_width and 0 < goal[1] and goal[1] >= tab_height:
         print("goal position out of bounds. Please enter a valid position and run code again.")
+        return
 
             
     ##########
@@ -192,3 +197,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
