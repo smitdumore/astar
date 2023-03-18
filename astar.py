@@ -79,12 +79,13 @@ class Astar:
         self.step_size = step_size
         self.robot_radius = robot_radius
         self.clearance = clearance
+        self.image = np.zeros((250, 600, 3), np.uint8)
         
         self.heap = []
         self.came_from = {}
         self.cost_so_far = {}
         self.visited = []
-
+        
     def search(self):
 
         heapq.heappush(self.heap, (0, self.start))
@@ -100,7 +101,7 @@ class Astar:
 
             if self.is_goal_reached(current):
                 self.came_from[self.goal] = current
-                print("Goal found")
+                print("Goal found.")
                 self.backtrack()
                 break
 
@@ -109,6 +110,8 @@ class Astar:
                 if next in self.visited:
                     continue
                 
+                cv2.line(self.image, (next[0], next[1]) , (current[0], current[1]), (0, 255, 0), 1)
+
                 edge_cost = self.step_size
                 new_cost = self.cost_so_far[current] + edge_cost
 
@@ -122,6 +125,30 @@ class Astar:
         # Search ended
         # Goal not found
         return
+        
+    def is_goal_reached(self, current):
+        #return (current[0] - self.goal[0])*(current[0] - self.goal[0]) + (current[1] - self.goal[1])*(current[1] - self.goal[1]) <= 1.5
+
+        if(abs(current[0] - self.goal[0]) < 1.5 and abs (current[1] - self.goal[1]) <= 1.5):
+            return True
+        return False
+
+    def backtrack(self):
+        
+        path = []
+        current = self.goal
+
+        while current != self.start:
+            
+            path.append(current)
+            
+            current = self.came_from[current]
+        
+        path.append(self.start)
+        path.reverse()
+        print("backtracking done.  visualising ...")
+        self.visualise(path)
+        return path
     
     def neighbors(self, curr_node):
 
@@ -150,7 +177,8 @@ class Astar:
         
     def heuristic(self, n_x, n_y):
         return math.sqrt(((n_x - self.goal[0])**2) + ((n_y - self.goal[1])**2))
-    
+
+
     def visualise(self, path):
     
         White = (255, 255, 255)
@@ -175,28 +203,6 @@ class Astar:
         #cv2.destroyAllWindows()
         time.sleep(50)
         cv2.waitKey(100)
-
-
-    
-    def is_goal_reached(self, current):
-        return (current[0] - self.goal[0])*(current[0] - self.goal[0]) + (current[1] - self.goal[1])*(current[1] - self.goal[1]) <= 64
-    
-    def backtrack(self):
-        
-        path = []
-        current = self.goal
-
-        while current != self.start:
-            
-            path.append(current)
-            
-            current = self.came_from[current]
-        
-        path.append(self.start)
-        path.reverse()
-
-        self.visualise(self.obstacles, self.visited, path)
-        return path
 
 
 def main():
