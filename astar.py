@@ -150,6 +150,32 @@ class Astar:
         
     def heuristic(self, n_x, n_y):
         return math.sqrt(((n_x - self.goal[0])**2) + ((n_y - self.goal[1])**2))
+    
+    def visualise(self, path):
+    
+        White = (255, 255, 255)
+        Blue = (255, 0, 0)
+        Red = (0, 0, 255)
+
+        #visualise padded obs
+        for point in self.obstacles:
+            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+1, point[1]+1), White, -1)
+        
+        # Visualise original obstacles
+        obstacle_points = get_inquality_obstacles(0)
+        for point in obstacle_points:
+            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+1, point[1]+1), Blue, -1)
+
+        # Path
+        for point in path:
+            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+3, point[1]+3), Red, -1)
+            cv2.imshow("Astar", self.image)
+            cv2.waitKey(1)
+        
+        #cv2.destroyAllWindows()
+        time.sleep(50)
+        cv2.waitKey(100)
+
 
     
     def is_goal_reached(self, current):
