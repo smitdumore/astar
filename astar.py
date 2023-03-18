@@ -123,6 +123,35 @@ class Astar:
         # Goal not found
         return
     
+    def neighbors(self, curr_node):
+
+        sucessors = []
+        angle_action_set = [-60, -30, 0, 30, 60]
+
+        x = curr_node[0]
+        y = curr_node[1]
+        ori = curr_node[2]
+
+        for theta in angle_action_set:
+            neigh_x = round(x + self.step_size*(math.cos(math.radians(ori + theta))))
+            neigh_y = round(y + self.step_size*(math.sin(math.radians(ori + theta))))
+            neigh_ori = ori + theta
+
+            n = (neigh_x, neigh_y, neigh_ori)
+            n_xy = (neigh_x, neigh_y)
+            
+            if n_xy not in self.obstacles and\
+                    0 <= n[0] < tab_width and\
+                    0 <= n[1] < tab_height:
+
+                sucessors.append(n)
+
+        return sucessors
+        
+    def heuristic(self, n_x, n_y):
+        return math.sqrt(((n_x - self.goal[0])**2) + ((n_y - self.goal[1])**2))
+
+    
     def is_goal_reached(self, current):
         return (current[0] - self.goal[0])*(current[0] - self.goal[0]) + (current[1] - self.goal[1])*(current[1] - self.goal[1]) <= 64
     
