@@ -107,7 +107,7 @@ class Astar:
 
             for next in self.neighbors(current):
 
-                if next in self.visited:
+                if self.is_visited(next):
                     continue
                 
                 cv2.line(self.image, (next[0], next[1]) , (current[0], current[1]), (0, 255, 0), 1)
@@ -126,14 +126,23 @@ class Astar:
         # Goal not found
         print("no path from start to goal")
         return
+    
+    def is_visited(self, current):
+        
+        for node in self.visited:
+            if np.sqrt((current[0] - node[0])**2 + (current[1] - node[1])**2) <= 0.5\
+                  and abs(current[2] - node[2]) <= 30:
+                return True
+        
+        return False
         
     def is_goal_reached(self, current):
-        if np.sqrt((current[0] - self.goal[0])**2 + (current[1] - self.goal[1])**2) <= 1.5 and abs(current[2] - self.goal[2]) <= 30:
+        if np.sqrt((current[0] - self.goal[0])**2 + (current[1] - self.goal[1])**2) <= 1.5\
+              and current[2] == self.goal[2]:
             return True
         return False
 
         
-
     def backtrack(self):
         
         path = []
@@ -169,13 +178,16 @@ class Astar:
             
             neigh_ori = ori + theta
 
+            if neigh_ori < 0:
+                neigh_ori += 360 
+            neigh_ori %= 360
+
             n = (neigh_x, neigh_y, neigh_ori)
             n_xy = (neigh_x, neigh_y)
             
             if n_xy not in self.obstacles and\
                     0 <= n[0] < tab_width and\
                     0 <= n[1] < tab_height:
-
 
                 sucessors.append(n)
 
@@ -205,7 +217,7 @@ class Astar:
 
         # Path
         for point in path:
-            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+3, point[1]+3), Red, -1)
+            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+2, point[1]+2), Red, -1)
             cv2.imshow("Astar", self.image)
             cv2.waitKey(1)
         
@@ -219,26 +231,26 @@ def main():
     # Get start pos from user
     start_x = int(input("Enter start x coordinate: "))
     start_y = int(input("Enter start y coordinate: "))
-    start_ori = int(input("Enter start orientation (in deg.): "))
-    start_ori = 360 - start_ori
-    start_ori = start_ori*(np.pi)/180
+    start_ori = int(input("Enter start orientation (multiple of 30deg): "))
     # Change origin
+    if start_ori != 0:
+        start_ori = 360 - start_ori
     start_y = tab_height - start_y
     start = (start_x, start_y, start_ori)
       
     # get goal pos from user
     goal_x = int(input("Enter goal x coordinate: "))
     goal_y = int(input("Enter goal y coordinate: "))
-    goal_ori = int(input("Enter goal orientation (in deg.) : "))
-    goal_ori = 360 - goal_ori
-    goal_ori = goal_ori*(np.pi)/180
+    goal_ori = int(input("Enter goal orientation (multiple of 30deg) : "))
     # Change origin
+    if goal_ori != 0:
+        goal_ori = 360 - goal_ori
     goal_y = tab_height - goal_y
     goal = (goal_x, goal_y, goal_ori)
 
     step_size = int(input("Enter step size between 0 and 10: "))
-    robot_radius = 5
-    clearance = 5
+    robot_radius = int(input("Enter robot radius (5): "))
+    clearance = int(input("Enter clearance (5): "))
 
     # Generate obstacles
     occupied = get_inquality_obstacles(clearance + robot_radius)
@@ -257,7 +269,7 @@ def main():
         print("goal position out of bounds. Please enter a valid position and run code again.")
         return
 
-            
+    
     ##########
     # A-Star #
     ##########
