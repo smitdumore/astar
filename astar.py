@@ -72,7 +72,7 @@ def get_inquality_obstacles(clearance):
 
 class Astar:
     def __init__(self, start, goal, obstacles, step_size, robot_radius, clearance):
-        # x,y,theta,h  
+        # x,y,theta
         self.start = (start[0], start[1], start[2])
         self.goal =  (goal[0], goal[1], goal[2])
         self.obstacles = obstacles
@@ -84,7 +84,7 @@ class Astar:
         self.heap = []
         self.came_from = {}
         self.cost_so_far = {}
-        self.visited = []
+        self.visited = np.zeros((2*tab_height,2*tab_width,12))
         
     def search(self):
 
@@ -97,12 +97,12 @@ class Astar:
 
             print("searching", current[0], tab_height - current[1])
 
-            self.visited.append(current)
+            self.visited[int(current[0]*2)][int(current[1]*2)][int(current[2]/30)] = 1
 
             if self.is_goal_reached(current):
-                self.came_from[self.goal] = current
+                #self.came_from[self.goal] = current
                 print("Goal found.")
-                self.backtrack()
+                self.backtrack(current)
                 break
 
             for next in self.neighbors(current):
@@ -129,29 +129,25 @@ class Astar:
     
     def is_visited(self, current):
         
-        for node in self.visited:
-            if np.sqrt((current[0] - node[0])**2 + (current[1] - node[1])**2) <= 0.5\
-                  and abs(current[2] - node[2]) <= 30:
-                return True
+        if self.visited[int(current[0]*2)][int(current[1]*2)][int(current[2]/30)] == 1:
+            return True
         
         return False
         
     def is_goal_reached(self, current):
+
         if np.sqrt((current[0] - self.goal[0])**2 + (current[1] - self.goal[1])**2) <= 1.5\
               and current[2] == self.goal[2]:
             return True
         return False
-
-        
-    def backtrack(self):
+     
+    def backtrack(self, current):
         
         path = []
-        current = self.goal
+        #current = self.goal
 
         while current != self.start:
-            
-            path.append(current)
-            
+            path.append(current)    
             current = self.came_from[current]
         
         path.append(self.start)
@@ -196,7 +192,6 @@ class Astar:
     def heuristic(self, n_x, n_y):
         return math.sqrt(((n_x - self.goal[0])**2) + ((n_y - self.goal[1])**2))
 
-
     def normalize(self, val):
         return round(val*2)/2
     
@@ -216,8 +211,12 @@ class Astar:
             cv2.rectangle(self.image, (point[0], point[1]), (point[0]+1, point[1]+1), Blue, -1)
 
         # Path
+        i = 0
+        last_point = self.start
         for point in path:
-            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+2, point[1]+2), Red, -1)
+            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+1, point[1]+1), Red, -1)
+            cv2.line(self.image, (last_point[0], last_point[1]) , (point[0], point[1]), Red, 2)
+            last_point = point
             cv2.imshow("Astar", self.image)
             cv2.waitKey(1)
         
