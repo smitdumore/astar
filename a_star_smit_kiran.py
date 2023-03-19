@@ -211,10 +211,9 @@ class Astar:
             cv2.rectangle(self.image, (point[0], point[1]), (point[0]+1, point[1]+1), Blue, -1)
 
         # Path
-        i = 0
         last_point = self.start
         for point in path:
-            cv2.rectangle(self.image, (point[0], point[1]), (point[0]+1, point[1]+1), Red, -1)
+            cv2.rectangle(self.image, (point[0]-2, point[1]-2), (point[0]+2, point[1]+2), Red, -1)
             cv2.line(self.image, (last_point[0], last_point[1]) , (point[0], point[1]), Red, 2)
             last_point = point
             cv2.imshow("Astar", self.image)
