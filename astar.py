@@ -124,6 +124,7 @@ class Astar:
 
         # Search ended
         # Goal not found
+        print("no path from start to goal")
         return
         
     def is_goal_reached(self, current):
@@ -160,8 +161,12 @@ class Astar:
         ori = curr_node[2]
 
         for theta in angle_action_set:
-            neigh_x = round(x + self.step_size*(math.cos(math.radians(ori + theta))))
-            neigh_y = round(y + self.step_size*(math.sin(math.radians(ori + theta))))
+            neigh_x = self.threshold( x + self.step_size*(math.cos(math.radians(ori + theta))))
+            neigh_y = self.threshold(y + self.step_size*(math.sin(math.radians(ori + theta))))
+            
+            neigh_x = round(neigh_x)
+            neigh_y = round(neigh_y)
+            
             neigh_ori = ori + theta
 
             n = (neigh_x, neigh_y, neigh_ori)
@@ -171,6 +176,7 @@ class Astar:
                     0 <= n[0] < tab_width and\
                     0 <= n[1] < tab_height:
 
+
                 sucessors.append(n)
 
         return sucessors
@@ -179,6 +185,9 @@ class Astar:
         return math.sqrt(((n_x - self.goal[0])**2) + ((n_y - self.goal[1])**2))
 
 
+    def threshold(self, num):
+        return round(num*2)/2
+    
     def visualise(self, path):
     
         White = (255, 255, 255)
