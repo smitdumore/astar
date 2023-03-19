@@ -128,11 +128,11 @@ class Astar:
         return
         
     def is_goal_reached(self, current):
-        #return (current[0] - self.goal[0])*(current[0] - self.goal[0]) + (current[1] - self.goal[1])*(current[1] - self.goal[1]) <= 1.5
-
-        if(abs(current[0] - self.goal[0]) < 1.5 and abs (current[1] - self.goal[1]) <= 1.5):
+        if np.sqrt((current[0] - self.goal[0])**2 + (current[1] - self.goal[1])**2) <= 1.5 and abs(current[2] - self.goal[2]) <= 30:
             return True
         return False
+
+        
 
     def backtrack(self):
         
@@ -161,8 +161,8 @@ class Astar:
         ori = curr_node[2]
 
         for theta in angle_action_set:
-            neigh_x = self.threshold( x + self.step_size*(math.cos(math.radians(ori + theta))))
-            neigh_y = self.threshold(y + self.step_size*(math.sin(math.radians(ori + theta))))
+            neigh_x = self.normalize( x + self.step_size*(math.cos(math.radians(ori + theta))))
+            neigh_y = self.normalize( y + self.step_size*(math.sin(math.radians(ori + theta))))
             
             neigh_x = round(neigh_x)
             neigh_y = round(neigh_y)
@@ -185,8 +185,8 @@ class Astar:
         return math.sqrt(((n_x - self.goal[0])**2) + ((n_y - self.goal[1])**2))
 
 
-    def threshold(self, num):
-        return round(num*2)/2
+    def normalize(self, val):
+        return round(val*2)/2
     
     def visualise(self, path):
     
